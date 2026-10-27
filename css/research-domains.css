@@ -1,0 +1,13 @@
+/* ==========================================================================
+   Proofix Technologies — Research Domains page
+   ========================================================================== */
+
+.domain-section { padding-top: 48px; }
+.domain-block { display: grid; grid-template-columns: 340px 1fr; gap: 48px; padding: 48px 0; border-bottom: 1px solid var(--line); }
+.domain-block:first-child, .domain-block:first-of-type { padding-top: 0; }
+.domain-block:last-child { border-bottom: 0; }
+@media (max-width: 960px) {
+  .domain-section { padding-top: 32px; }
+  .domain-block { grid-template-columns: 1fr; gap: 20px; padding: 36px 0; }
+}
+

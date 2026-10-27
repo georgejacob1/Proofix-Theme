@@ -1,0 +1,20 @@
+/* ==========================================================================
+   Proofix Technologies — Blogs & blog detail (blog cards also used on Home)
+   ========================================================================== */
+
+.blog-card { padding: 0; overflow: hidden; display: flex; flex-direction: column; }
+.blog-card .thumb { aspect-ratio: 16/9; background: var(--primary-50); overflow: hidden; }
+.blog-card .thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s ease; }
+.blog-card:hover .thumb img { transform: scale(1.05); }
+.blog-card .body { padding: 26px; display: flex; flex-direction: column; flex: 1; }
+.blog-card .meta { display: flex; gap: 12px; align-items: center; font-size: .82rem; margin-bottom: 12px; }
+.blog-card h3 { font-size: 1.2rem; }
+.blog-card p { flex: 1; font-size: .94rem; }
+.article { max-width: 780px; margin: 0 auto; }
+.article-cover { border-radius: var(--r-lg); box-shadow: var(--shadow-lg); aspect-ratio: 16/8; object-fit: cover; width: 100%; margin: -56px 0 40px; position: relative; z-index: 2; }
+.article p, .article li { font-size: 1.08rem; color: var(--ink-soft); }
+.article ol { padding-left: 1.3em; margin: 0 0 1.4em; }
+.article ol li { margin-bottom: 12px; padding-left: 6px; }
+.article ol li::marker { color: var(--primary); font-weight: 800; }
+.article-meta { display: flex; gap: 14px; align-items: center; font-size: .9rem; margin-bottom: 24px; }
+@media (max-width: 640px) { .article-cover { margin-top: -36px; } }

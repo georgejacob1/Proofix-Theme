@@ -1,0 +1,31 @@
+/* ==========================================================================
+   Proofix Technologies — Contact page
+   ========================================================================== */
+
+.contact-layout { display: grid; grid-template-columns: 1.4fr 1fr; gap: 40px; align-items: start; }
+.form-card { padding: 36px; }
+.form-card:hover { transform: none; box-shadow: none; border-color: var(--line); }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.form-group { margin-bottom: 18px; }
+.form-group label { display: block; font-size: .88rem; font-weight: 700; color: var(--ink); margin-bottom: 7px; }
+.form-input, .form-select, .form-textarea {
+  width: 100%; padding: 13px 16px; border: 1.5px solid var(--line); border-radius: var(--r-sm); background: var(--bg-soft);
+  font: 500 .96rem var(--font); color: var(--ink); transition: var(--ease);
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: var(--primary); background: #fff; box-shadow: 0 0 0 4px var(--primary-100); }
+.form-input.invalid, .form-select.invalid { border-color: #DC2626; }
+.form-textarea { min-height: 130px; resize: vertical; }
+.form-error { color: #DC2626; font-size: .86rem; margin: 0 0 14px; display: none; }
+.form-success { display: none; text-align: center; padding: 40px 12px; }
+.form-success img.big { font-size: 3.4rem; filter: var(--f-success); margin-bottom: 14px; }
+.contact-item { display: flex; gap: 16px; align-items: center; padding: 18px 0; border-bottom: 1px solid var(--line); }
+.contact-item:last-child { border-bottom: 0; }
+.contact-item .icon-box { margin: 0; width: 48px; height: 48px; flex-shrink: 0; }
+.contact-item small { display: block; color: var(--ink-mute); }
+.contact-item a, .contact-item strong { color: var(--ink); font-weight: 700; word-break: break-word; }
+
+@media (max-width: 960px) { .contact-layout { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 640px) {
+  .form-row { grid-template-columns: minmax(0, 1fr); }
+  .form-card { padding: 22px; }
+}

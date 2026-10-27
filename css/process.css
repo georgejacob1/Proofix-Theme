@@ -1,0 +1,19 @@
+/* ==========================================================================
+   Proofix Technologies — Our Process page
+   ========================================================================== */
+
+.timeline { position: relative; display: grid; gap: 32px; }
+.timeline::before { content: ""; position: absolute; left: 31px; top: 20px; bottom: 20px; width: 2px; background: var(--primary-100); }
+.phase { position: relative; display: grid; grid-template-columns: 64px 1fr; gap: 28px; }
+.phase .badge { width: 64px; height: 64px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.3rem; box-shadow: 0 0 0 8px #fff; position: relative; z-index: 1; }
+.section.soft .phase .badge { box-shadow: 0 0 0 8px var(--bg-soft); }
+.phase .card:hover { transform: none; }
+.phase .label { font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--accent-600); }
+.phase h3 { font-size: 1.35rem; margin: 4px 0 6px; }
+.phase .tagline { color: var(--primary); font-weight: 600; margin-bottom: 12px; }
+
+@media (max-width: 640px) {
+  .timeline::before { left: 23px; }
+  .phase { grid-template-columns: 48px 1fr; gap: 16px; }
+  .phase .badge { width: 48px; height: 48px; font-size: 1.05rem; box-shadow: 0 0 0 6px #fff; }
+}

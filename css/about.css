@@ -1,0 +1,6 @@
+/* ==========================================================================
+   Proofix Technologies — About page
+   ========================================================================== */
+
+.vm-card h3 { display: flex; align-items: center; gap: 12px; }
+.vm-card h3 img { filter: var(--f-accent-600); }
