@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Services listing (post type archive).
+ * Template Name: Services Page
  */
 
 get_header();
@@ -17,9 +17,11 @@ get_template_part('include/page-banner', null, array(
 <section class="section">
   <div class="container">
     <div class="grid grid-4">
-      <?php while (have_posts()) : the_post();
+      <?php foreach (proofix_services() as $post) :
+        setup_postdata($post);
         get_template_part('include/service-card');
-      endwhile; ?>
+      endforeach;
+      wp_reset_postdata(); ?>
     </div>
   </div>
 </section>

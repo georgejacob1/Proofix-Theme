@@ -42,19 +42,13 @@ function proofix_url($key)
     'process'  => 'our-process',
     'domains'  => 'research-domains',
     'faq'      => 'faq',
+    'services' => 'services',
+    'blogs'    => 'blogs',
     'contact'  => 'contact-us',
   );
 
   if ($key === 'home') {
     return home_url('/');
-  }
-
-  if ($key === 'services') {
-    return get_post_type_archive_link('service');
-  }
-
-  if ($key === 'blogs') {
-    return get_post_type_archive_link('blog');
   }
 
   return isset($slugs[$key]) ? home_url('/' . $slugs[$key] . '/') : home_url('/');
@@ -135,9 +129,9 @@ function proofix_assets_js_css()
     wp_enqueue_style('proofix-faq', get_template_directory_uri() . '/css/faq.css', array(), $version);
   } elseif (is_singular('service')) {
     wp_enqueue_style('proofix-service-detail', get_template_directory_uri() . '/css/service-detail.css', array(), $version);
-  } elseif (is_post_type_archive('service')) {
+  } elseif (is_page_template('template-services.php')) {
     wp_enqueue_style('proofix-services', get_template_directory_uri() . '/css/services.css', array(), $version);
-  } elseif (is_singular('blog') || is_post_type_archive('blog')) {
+  } elseif (is_singular('blog') || is_page_template('template-blogs.php')) {
     wp_enqueue_style('proofix-blogs', get_template_directory_uri() . '/css/blogs.css', array(), $version);
   } elseif (is_page_template('template-about.php')) {
     wp_enqueue_style('proofix-about', get_template_directory_uri() . '/css/about.css', array(), $version);
@@ -190,7 +184,7 @@ function proofix_register_post_types()
       'not_found'          => __('No services found.', 'proofix'),
     ),
     'public'        => true,
-    'has_archive'   => 'services',
+    'has_archive'   => false,
     'rewrite'       => array('slug' => 'service', 'with_front' => false),
     'menu_icon'     => 'dashicons-welcome-learn-more',
     'menu_position' => 20,
@@ -209,7 +203,7 @@ function proofix_register_post_types()
       'not_found'          => __('No blogs found.', 'proofix'),
     ),
     'public'        => true,
-    'has_archive'   => 'blogs',
+    'has_archive'   => false,
     'rewrite'       => array('slug' => 'blog', 'with_front' => false),
     'menu_icon'     => 'dashicons-edit-page',
     'menu_position' => 21,
@@ -497,7 +491,7 @@ function proofix_menu_fallback()
 ?>
   <a class="nav-link<?php echo is_front_page() ? ' active' : ''; ?>" href="<?php echo esc_url(proofix_url('home')); ?>">Home</a>
   <a class="nav-link<?php echo is_page_template('template-about.php') ? ' active' : ''; ?>" href="<?php echo esc_url(proofix_url('about')); ?>">About Us</a>
-  <div class="has-menu"><button class="nav-link<?php echo (is_post_type_archive('service') || is_singular('service')) ? ' active' : ''; ?>" aria-haspopup="true">Services <?php echo proofix_icon('chevron-down.svg'); ?></button>
+  <div class="has-menu"><button class="nav-link<?php echo (is_page_template('template-services.php') || is_singular('service')) ? ' active' : ''; ?>" aria-haspopup="true">Services <?php echo proofix_icon('chevron-down.svg'); ?></button>
     <div class="menu">
       <a href="<?php echo esc_url(proofix_url('services')); ?>">All Services</a>
       <?php foreach ($services as $service) { ?>
@@ -514,7 +508,7 @@ function proofix_menu_fallback()
     </div>
   </div>
   <a class="nav-link<?php echo is_page_template('template-process.php') ? ' active' : ''; ?>" href="<?php echo esc_url(proofix_url('process')); ?>">Our Process</a>
-  <a class="nav-link<?php echo (is_post_type_archive('blog') || is_singular('blog')) ? ' active' : ''; ?>" href="<?php echo esc_url(proofix_url('blogs')); ?>">Blogs</a>
+  <a class="nav-link<?php echo (is_page_template('template-blogs.php') || is_singular('blog')) ? ' active' : ''; ?>" href="<?php echo esc_url(proofix_url('blogs')); ?>">Blogs</a>
   <a class="nav-link<?php echo is_page_template('template-faq.php') ? ' active' : ''; ?>" href="<?php echo esc_url(proofix_url('faq')); ?>">FAQ</a>
 <?php
 }
@@ -681,3 +675,7 @@ function proofix_contact_submit()
 }
 add_action('wp_ajax_proofix_contact', 'proofix_contact_submit');
 add_action('wp_ajax_nopriv_proofix_contact', 'proofix_contact_submit');
+
+// Use the classic editor instead of the block editor.
+add_filter('use_block_editor_for_post', '__return_false', 100);
+add_filter('use_block_editor_for_post_type', '__return_false', 100);
