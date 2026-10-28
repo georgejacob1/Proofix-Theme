@@ -9,7 +9,6 @@ get_header();
 
 $contact  = proofix_contact();
 $services = proofix_services();
-$domains  = proofix_domains();
 $stages   = array('Topic Selection & Basepaper Finalization', 'Proposal & Synopsis Preparation', 'Literature Review', 'Research Methodology', 'Data Analysis & Statistics', 'Thesis / Dissertation Writing', 'Manuscript Preparation', 'Journal Submission / Reviewer Revision');
 
 get_template_part('include/page-banner', null, array(
@@ -34,9 +33,12 @@ get_template_part('include/page-banner', null, array(
           <div class="form-group"><label for="inquiryDomain">Research Domain *</label>
             <select class="form-select" id="inquiryDomain">
               <option value="">Select domain</option>
-              <?php foreach ($domains as $domain) { ?>
-                <option value="<?php echo esc_attr($domain['title']); ?>"><?php echo esc_html($domain['title']); ?></option>
-              <?php } ?>
+              <option value="Engineering &amp; Technology">Engineering &amp; Technology</option>
+              <option value="Computer Science &amp; Information Technology">Computer Science &amp; Information Technology</option>
+              <option value="Artificial Intelligence &amp; Machine Learning">Artificial Intelligence &amp; Machine Learning</option>
+              <option value="Data Science &amp; Analytics">Data Science &amp; Analytics</option>
+              <option value="Management &amp; Business Research">Management &amp; Business Research</option>
+              <option value="Healthcare &amp; Medical Research">Healthcare &amp; Medical Research</option>
               <option value="Interdisciplinary / Other">Interdisciplinary / Other</option>
             </select>
           </div>

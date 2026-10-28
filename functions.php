@@ -1,8 +1,6 @@
 <?php
 define('TEMPLATE_URL', get_template_directory_uri() . '/');
 
-require_once get_template_directory() . '/include/data.php';
-
 function proofix_setup()
 {
   load_theme_textdomain('proofix');
@@ -96,18 +94,18 @@ function proofix_adjacent_service($post_id, $direction)
   return $services[$target];
 }
 
-function proofix_service_icon($post_id)
-{
-  $icon = get_post_meta($post_id, 'service_icon', true);
-
-  return $icon ? $icon : 'file-signature.svg';
-}
-
 function proofix_read_time($post_id)
 {
   $minutes = (int) get_post_meta($post_id, 'blog_read_time', true);
 
   return $minutes > 0 ? $minutes . ' min read' : '';
+}
+
+function proofix_service_icon($post_id)
+{
+  $icon = get_post_meta($post_id, 'service_icon', true);
+
+  return $icon ? $icon : 'file-signature.svg';
 }
 
 
@@ -211,93 +209,8 @@ function proofix_register_post_types()
     'show_in_rest'  => true,
   ));
 
-  // Listing-only: shown on the page using the "Research Domains" template; no archive or inner page.
-  register_post_type('research-domain', array(
-    'labels' => array(
-      'name'               => __('Research Domains', 'proofix'),
-      'singular_name'      => __('Research Domain', 'proofix'),
-      'add_new_item'       => __('Add New Research Domain', 'proofix'),
-      'edit_item'          => __('Edit Research Domain', 'proofix'),
-      'all_items'          => __('All Research Domains', 'proofix'),
-      'search_items'       => __('Search Research Domains', 'proofix'),
-      'not_found'          => __('No research domains found.', 'proofix'),
-    ),
-    'public'             => false,
-    'publicly_queryable' => false,
-    'show_ui'            => true,
-    'show_in_menu'       => true,
-    'show_in_nav_menus'  => false,
-    'has_archive'        => false,
-    'rewrite'            => false,
-    'menu_icon'          => 'dashicons-networking',
-    'menu_position'      => 22,
-    'supports'           => array('title', 'excerpt', 'page-attributes'),
-    'show_in_rest'       => true,
-  ));
 }
 add_action('init', 'proofix_register_post_types');
-
-// Import the built-in domains the first time, when none exist yet.
-function proofix_seed_domains()
-{
-  if (get_option('proofix_domains_seeded')) {
-    return;
-  }
-
-  $existing = get_posts(array('post_type' => 'research-domain', 'post_status' => 'any', 'posts_per_page' => 1, 'fields' => 'ids'));
-
-  if (!$existing) {
-    foreach (proofix_default_domains() as $order => $domain) {
-      $post_id = wp_insert_post(array(
-        'post_type'    => 'research-domain',
-        'post_status'  => 'publish',
-        'post_title'   => $domain['title'],
-        'post_name'    => preg_replace('/^domain-/', '', $domain['id']),
-        'post_excerpt' => $domain['text'],
-        'menu_order'   => $order,
-      ));
-
-      if ($post_id && !is_wp_error($post_id)) {
-        update_post_meta($post_id, 'domain_icon', $domain['icon']);
-        update_post_meta($post_id, 'domain_lead', $domain['lead']);
-        update_post_meta($post_id, 'domain_chips', implode("\n", $domain['chips']));
-        update_post_meta($post_id, 'domain_note', $domain['note']);
-      }
-    }
-  }
-
-  update_option('proofix_domains_seeded', 1);
-}
-add_action('init', 'proofix_seed_domains', 20);
-
-// Same shape the templates always used: id, icon, title, text, lead, chips, note.
-function proofix_domains()
-{
-  $posts = get_posts(array(
-    'post_type'      => 'research-domain',
-    'post_status'    => 'publish',
-    'orderby'        => array('menu_order' => 'ASC', 'title' => 'ASC'),
-    'posts_per_page' => -1,
-  ));
-
-  $domains = array();
-
-  foreach ($posts as $post) {
-    $chips = preg_split('/\r\n|\r|\n/', (string) get_post_meta($post->ID, 'domain_chips', true));
-
-    $domains[] = array(
-      'id'    => 'domain-' . $post->post_name,
-      'icon'  => get_post_meta($post->ID, 'domain_icon', true) ?: 'gears.svg',
-      'title' => $post->post_title,
-      'text'  => $post->post_excerpt,
-      'lead'  => get_post_meta($post->ID, 'domain_lead', true),
-      'chips' => array_values(array_filter(array_map('trim', $chips), 'strlen')),
-      'note'  => (string) get_post_meta($post->ID, 'domain_note', true),
-    );
-  }
-
-  return $domains;
-}
 
 function proofix_rewrite_flush()
 {
@@ -307,122 +220,13 @@ function proofix_rewrite_flush()
 add_action('after_switch_theme', 'proofix_rewrite_flush');
 
 
-/* ---------------------------------------------------------------
- * Meta boxes (plain WordPress, no plugin needed)
- * ------------------------------------------------------------- */
-
+/* Blog featured image box */
 function proofix_add_meta_boxes()
 {
-  add_meta_box('proofix_service_meta', __('Service Details', 'proofix'), 'proofix_service_meta_box', 'service', 'normal', 'high');
-  add_meta_box('proofix_blog_meta', __('Blog Details', 'proofix'), 'proofix_blog_meta_box', 'blog', 'side', 'default');
-  add_meta_box('proofix_domain_meta', __('Domain Details', 'proofix'), 'proofix_domain_meta_box', 'research-domain', 'normal', 'high');
-
   remove_meta_box('postimagediv', 'blog', 'side');
   add_meta_box('postimagediv', __('Featured Image <br> Best Proportion: 1200 px x 700 px'), 'post_thumbnail_meta_box', 'blog', 'side', 'low');
 }
 add_action('add_meta_boxes', 'proofix_add_meta_boxes');
-
-function proofix_service_meta_box($post)
-{
-  wp_nonce_field('proofix_save_meta', 'proofix_meta_nonce');
-
-  $icon     = get_post_meta($post->ID, 'service_icon', true);
-  $includes = get_post_meta($post->ID, 'service_includes', true);
-?>
-  <p>
-    <label for="service_icon"><strong>Icon file</strong> (from <code>assets/images/icon/</code>, e.g. <code>file-signature.svg</code>)</label><br>
-    <input type="text" id="service_icon" name="service_icon" value="<?php echo esc_attr($icon); ?>" class="widefat">
-  </p>
-  <p>
-    <label for="service_includes"><strong>Our support includes</strong> (one item per line)</label><br>
-    <textarea id="service_includes" name="service_includes" rows="12" class="widefat"><?php echo esc_textarea($includes); ?></textarea>
-  </p>
-  <p class="description">Use the Excerpt box for the short summary shown on cards and in the page banner, and the editor for the lead paragraphs. Order is controlled by "Order" in Page Attributes.</p>
-<?php
-}
-
-function proofix_domain_meta_box($post)
-{
-  wp_nonce_field('proofix_save_meta', 'proofix_meta_nonce');
-
-  $icon  = get_post_meta($post->ID, 'domain_icon', true);
-  $lead  = get_post_meta($post->ID, 'domain_lead', true);
-  $chips = get_post_meta($post->ID, 'domain_chips', true);
-  $note  = get_post_meta($post->ID, 'domain_note', true);
-?>
-  <p>
-    <label for="domain_icon"><strong>Icon file</strong> (from <code>assets/images/icon/</code>, e.g. <code>gears.svg</code>)</label><br>
-    <input type="text" id="domain_icon" name="domain_icon" value="<?php echo esc_attr($icon); ?>" class="widefat">
-  </p>
-  <p>
-    <label for="domain_lead"><strong>Lead line</strong> (e.g. We support research in areas such as:)</label><br>
-    <input type="text" id="domain_lead" name="domain_lead" value="<?php echo esc_attr($lead); ?>" class="widefat">
-  </p>
-  <p>
-    <label for="domain_chips"><strong>Focus areas</strong> (one per line)</label><br>
-    <textarea id="domain_chips" name="domain_chips" rows="10" class="widefat"><?php echo esc_textarea($chips); ?></textarea>
-  </p>
-  <p>
-    <label for="domain_note"><strong>Note</strong> (optional)</label><br>
-    <textarea id="domain_note" name="domain_note" rows="3" class="widefat"><?php echo esc_textarea($note); ?></textarea>
-  </p>
-  <p class="description">Use the Excerpt box for the description shown beside the title. Order is controlled by "Order" in Page Attributes.</p>
-<?php
-}
-
-function proofix_blog_meta_box($post)
-{
-  wp_nonce_field('proofix_save_meta', 'proofix_meta_nonce');
-
-  $tag  = get_post_meta($post->ID, 'blog_tag', true);
-  $time = get_post_meta($post->ID, 'blog_read_time', true);
-?>
-  <p>
-    <label for="blog_tag"><strong>Tag</strong></label><br>
-    <input type="text" id="blog_tag" name="blog_tag" value="<?php echo esc_attr($tag); ?>" class="widefat" placeholder="Research Proposal">
-  </p>
-  <p>
-    <label for="blog_read_time"><strong>Read time (minutes)</strong></label><br>
-    <input type="number" min="1" id="blog_read_time" name="blog_read_time" value="<?php echo esc_attr($time); ?>" class="widefat">
-  </p>
-<?php
-}
-
-function proofix_save_meta($post_id)
-{
-  if (!isset($_POST['proofix_meta_nonce']) || !wp_verify_nonce($_POST['proofix_meta_nonce'], 'proofix_save_meta')) {
-    return;
-  }
-
-  if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
-    return;
-  }
-
-  if (!current_user_can('edit_post', $post_id)) {
-    return;
-  }
-
-  $text_fields = array('service_icon', 'blog_tag', 'blog_read_time', 'domain_icon', 'domain_lead');
-
-  foreach ($text_fields as $field) {
-    if (isset($_POST[$field])) {
-      update_post_meta($post_id, $field, sanitize_text_field(wp_unslash($_POST[$field])));
-    }
-  }
-
-  if (isset($_POST['service_includes'])) {
-    update_post_meta($post_id, 'service_includes', sanitize_textarea_field(wp_unslash($_POST['service_includes'])));
-  }
-
-  foreach (array('domain_chips', 'domain_note') as $field) {
-    if (isset($_POST[$field])) {
-      update_post_meta($post_id, $field, sanitize_textarea_field(wp_unslash($_POST[$field])));
-    }
-  }
-}
-add_action('save_post_research-domain', 'proofix_save_meta');
-add_action('save_post_service', 'proofix_save_meta');
-add_action('save_post_blog', 'proofix_save_meta');
 
 
 /* ---------------------------------------------------------------
@@ -487,7 +291,6 @@ class Proofix_Menu_Walker extends Walker_Nav_Menu
 function proofix_menu_fallback()
 {
   $services = proofix_services();
-  $domains  = proofix_domains();
 ?>
   <a class="nav-link<?php echo is_front_page() ? ' active' : ''; ?>" href="<?php echo esc_url(proofix_url('home')); ?>">Home</a>
   <a class="nav-link<?php echo is_page_template('template-about.php') ? ' active' : ''; ?>" href="<?php echo esc_url(proofix_url('about')); ?>">About Us</a>
@@ -502,9 +305,12 @@ function proofix_menu_fallback()
   <div class="has-menu"><button class="nav-link<?php echo is_page_template('template-research-domains.php') ? ' active' : ''; ?>" aria-haspopup="true">Research Domains <?php echo proofix_icon('chevron-down.svg'); ?></button>
     <div class="menu">
       <a href="<?php echo esc_url(proofix_url('domains')); ?>">All Domains</a>
-      <?php foreach ($domains as $domain) { ?>
-        <a href="<?php echo esc_url(proofix_url('domains') . '#' . $domain['id']); ?>"><?php echo esc_html($domain['title']); ?></a>
-      <?php } ?>
+      <a href="<?php echo esc_url(proofix_url('domains') . '#domain-engineering'); ?>">Engineering &amp; Technology</a>
+      <a href="<?php echo esc_url(proofix_url('domains') . '#domain-cs-it'); ?>">Computer Science &amp; Information Technology</a>
+      <a href="<?php echo esc_url(proofix_url('domains') . '#domain-ai-ml'); ?>">Artificial Intelligence &amp; Machine Learning</a>
+      <a href="<?php echo esc_url(proofix_url('domains') . '#domain-datascience'); ?>">Data Science &amp; Analytics</a>
+      <a href="<?php echo esc_url(proofix_url('domains') . '#domain-management'); ?>">Management &amp; Business Research</a>
+      <a href="<?php echo esc_url(proofix_url('domains') . '#domain-healthcare'); ?>">Healthcare &amp; Medical Research</a>
     </div>
   </div>
   <a class="nav-link<?php echo is_page_template('template-process.php') ? ' active' : ''; ?>" href="<?php echo esc_url(proofix_url('process')); ?>">Our Process</a>

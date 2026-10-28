@@ -6,14 +6,6 @@
 
 get_header();
 
-$paged = max(1, get_query_var('paged'), get_query_var('page'));
-$blogs = new WP_Query(array(
-  'post_type'      => 'blog',
-  'post_status'    => 'publish',
-  'paged'          => $paged,
-  'posts_per_page' => get_option('posts_per_page'),
-));
-
 get_template_part('include/page-banner', null, array(
   'title'   => 'Insights for Researchers',
   'text'    => 'Practical guidance on proposals, originality and publication.',
@@ -25,12 +17,25 @@ get_template_part('include/page-banner', null, array(
 <section class="section">
   <div class="container">
     <div class="grid grid-2" style="max-width:900px;margin:0 auto">
-      <?php while ($blogs->have_posts()) : $blogs->the_post();
-        get_template_part('include/blog-card');
-      endwhile;
-      wp_reset_postdata(); ?>
+      <a class="card blog-card" href="<?php echo esc_url(home_url('/blog/quality-research-proposal/')); ?>">
+        <div class="thumb"><img src="https://picsum.photos/id/20/800/450" alt="" loading="lazy"></div>
+        <div class="body">
+          <div class="meta"><span class="tag">Research Proposal</span><span>3 min read</span></div>
+          <h3>How to Write a Quality Research Proposal?</h3>
+          <p>Writing a quality research proposal is of utmost importance to start your PhD journey. The emphasis should be on the uniqueness of the research being presented.</p>
+          <span class="link-arrow">Read article <?php echo proofix_icon('arrow-right.svg'); ?></span>
+        </div>
+      </a>
+      <a class="card blog-card" href="<?php echo esc_url(home_url('/blog/impactful-journal-paper/')); ?>">
+        <div class="thumb"><img src="https://picsum.photos/id/24/800/450" alt="" loading="lazy"></div>
+        <div class="body">
+          <div class="meta"><span class="tag">Publication</span><span>2 min read</span></div>
+          <h3>How to Make a Journal Paper Impactful?</h3>
+          <p>Any research focuses on the novelty in the topic selected and how original your ideas are to the particular research area.</p>
+          <span class="link-arrow">Read article <?php echo proofix_icon('arrow-right.svg'); ?></span>
+        </div>
+      </a>
     </div>
-    <div class="pagination" style="text-align:center;margin-top:32px"><?php echo paginate_links(array('total' => $blogs->max_num_pages, 'current' => $paged)); ?></div>
   </div>
 </section>
 
