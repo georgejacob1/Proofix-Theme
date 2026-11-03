@@ -485,3 +485,70 @@ add_action('wp_ajax_nopriv_proofix_contact', 'proofix_contact_submit');
 // Use the classic editor instead of the block editor.
 add_filter('use_block_editor_for_post', '__return_false', 100);
 add_filter('use_block_editor_for_post_type', '__return_false', 100);
+
+
+/* ---------- Branded wp-login & wp-admin ---------- */
+function proofix_admin_brand_css() {
+  $logo = esc_url(get_template_directory_uri() . '/assets/images/logo.png');
+  ?>
+  <style>
+    :root { --pf-primary:#3730A3; --pf-primary-dark:#312E81; --pf-soft:#EEF0FF; }
+
+    /* Login page */
+    body.login { background: linear-gradient(135deg, #EEF0FF 0%, #F7F8FF 100%); }
+    body.login #login h1 a {
+      background-image: url('<?php echo $logo; ?>');
+      background-size: contain; background-repeat: no-repeat; background-position: center;
+      width: 100%; max-width: 240px; height: 80px;
+    }
+    body.login form {
+      border: 0; border-radius: 12px; padding: 26px;
+      box-shadow: 0 10px 30px rgba(55,48,163,.12);
+    }
+    body.login input:focus { border-color: var(--pf-primary); box-shadow: 0 0 0 1px var(--pf-primary); }
+    body.login .button-primary {
+      background: var(--pf-primary); border-color: var(--pf-primary);
+      border-radius: 8px; text-shadow: none; box-shadow: none;
+    }
+    body.login .button-primary:hover, body.login .button-primary:focus {
+      background: var(--pf-primary-dark); border-color: var(--pf-primary-dark);
+    }
+    body.login #nav a, body.login #backtoblog a { color: var(--pf-primary); }
+
+    /* Admin area */
+    #adminmenu, #adminmenu .wp-submenu, #adminmenuback, #adminmenuwrap { background: var(--pf-primary-dark); }
+    #adminmenu li.menu-top:hover, #adminmenu li.opensub > a.menu-top,
+    #adminmenu li > a.menu-top:focus { background: var(--pf-primary); }
+    #adminmenu li.current a.menu-top, #adminmenu .wp-has-current-submenu .wp-submenu .wp-submenu-head,
+    #adminmenu a.wp-has-current-submenu { background: var(--pf-primary); }
+    #wpadminbar { background: var(--pf-primary-dark); }
+    #adminmenu .wp-submenu a:hover, #adminmenu .wp-submenu a:focus { color: #fff; }
+    .wp-core-ui .button-primary { background: var(--pf-primary); border-color: var(--pf-primary); }
+    .wp-core-ui .button-primary:hover { background: var(--pf-primary-dark); border-color: var(--pf-primary-dark); }
+    a { color: var(--pf-primary); }
+    #wp-admin-bar-wp-logo > .ab-item .ab-icon:before { content: none; }
+    #wp-admin-bar-wp-logo > .ab-item .ab-icon {
+      background: url('<?php echo $logo; ?>') center/contain no-repeat; width: 40px; height: 32px;
+    }
+  </style>
+  <?php
+}
+add_action('login_enqueue_scripts', 'proofix_admin_brand_css');
+add_action('admin_head', 'proofix_admin_brand_css');
+
+add_filter('login_headerurl', function () { return home_url('/'); });
+add_filter('login_headertext', function () { return get_bloginfo('name'); });
+
+/* ---------- Favicon (front end, login, admin) ---------- */
+function proofix_favicon() {
+  // Drop assets/images/favicon.png in to override the logo fallback.
+  $file = file_exists(get_template_directory() . '/assets/images/favicon.png') ? 'favicon.png' : 'logo.png';
+  $url  = esc_url(get_template_directory_uri() . '/assets/images/' . $file);
+  echo '<link rel="icon" type="image/png" href="' . $url . '">' . "\n";
+  echo '<link rel="apple-touch-icon" href="' . $url . '">' . "\n";
+}
+add_action('wp_head', 'proofix_favicon', 1);
+add_action('login_head', 'proofix_favicon');
+add_action('admin_head', 'proofix_favicon');
+// Stop WordPress from also printing its default site icon/WP favicon.
+remove_action('wp_head', 'wp_site_icon', 99);
