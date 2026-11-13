@@ -15,7 +15,7 @@ $contact  = proofix_contact();
   <div class="container hero-grid">
     <div class="hero-copy">
       <span class="hero-pill"><?php echo proofix_icon('star-white.svg'); ?><b>Professional</b> Academic Research Support</span>
-      <h1>Empowering <span class="avatars"><img src="https://picsum.photos/id/1005/96/96" alt=""><img src="https://picsum.photos/id/1011/96/96" alt=""><img src="https://picsum.photos/id/1027/96/96" alt=""></span> Research. <em>Enabling Excellence.</em></h1>
+      <h1><?php echo proofix_hero_title(); ?></h1>
       <p class="lead">Proofix Technologies Pvt Ltd provides professional academic research assistance, technical guidance, and research support for scholars, researchers, faculty members, and academic professionals.</p>
       <div class="hero-actions">
         <a class="btn btn-primary" href="<?php echo esc_url(proofix_url('contact')); ?>">Start Your Journey <?php echo proofix_icon('arrow-right.svg'); ?></a>

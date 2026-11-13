@@ -132,6 +132,29 @@ function proofix_field_icon($post_id, $field)
   return '<img class="icon" src="' . esc_url($url) . '" alt="">';
 }
 
+// Hero <h1> from one ACF text field ("hero_title") on the front page.
+// Markers: {avatars} = the avatar image group, *text* = italic accent.
+// e.g. "Empowering {avatars} Research. *Enabling Excellence.*"
+function proofix_hero_title()
+{
+  $title = trim((string) get_post_meta((int) get_option('page_on_front'), 'hero_title', true));
+
+  if ($title === '') {
+    $title = 'Empowering {avatars} Research. *Enabling Excellence.*';
+  }
+
+  $avatars = '<span class="avatars">'
+    . '<img src="https://picsum.photos/id/1005/96/96" alt="">'
+    . '<img src="https://picsum.photos/id/1011/96/96" alt="">'
+    . '<img src="https://picsum.photos/id/1027/96/96" alt="">'
+    . '</span>';
+
+  $html = esc_html($title);
+  $html = preg_replace('/\*(.+?)\*/', '<em>$1</em>', $html);
+
+  return str_replace('{avatars}', $avatars, $html);
+}
+
 
 /* ---------------------------------------------------------------
  * Assets
