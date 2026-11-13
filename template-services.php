@@ -19,9 +19,9 @@ get_template_part('include/page-banner', null, array(
     <div class="grid grid-4">
       <?php foreach (proofix_services() as $service) { ?>
         <a class="card service-card" href="<?php echo esc_url(get_permalink($service->ID)); ?>">
-          <div class="icon-box"><?php echo proofix_icon(proofix_service_icon($service->ID)); ?></div>
+          <div class="icon-box"><?php echo proofix_service_icon($service->ID); ?></div>
           <h3><?php echo esc_html($service->post_title); ?></h3>
-          <p><?php echo esc_html($service->post_excerpt); ?></p>
+          <p><?php echo esc_html(get_field('description', $service->ID, false)); ?></p>
           <span class="link-arrow">View details <?php echo proofix_icon('arrow-right.svg'); ?></span>
         </a>
       <?php } ?>

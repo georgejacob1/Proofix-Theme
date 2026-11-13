@@ -56,7 +56,7 @@ while (have_posts()) : the_post();
                   <?php if ($time = proofix_read_time($blog->ID)) { ?><span><?php echo esc_html($time); ?></span><?php } ?>
                 </div>
                 <h3><?php echo esc_html($blog->post_title); ?></h3>
-                <p><?php echo esc_html($blog->post_excerpt); ?></p>
+                <p><?php echo esc_html(get_field('description', $blog->ID, false)); ?></p>
                 <span class="link-arrow">Read article <?php echo proofix_icon('arrow-right.svg'); ?></span>
               </div>
             </a>

@@ -9,7 +9,7 @@ get_header();
 while (have_posts()) : the_post();
 
   $contact  = proofix_contact();
-  $includes = array_filter(array_map('trim', explode("\n", (string) get_post_meta(get_the_ID(), 'service_includes', true))));
+  $includes = array_filter(array_map('trim', explode("\n", (string) get_field('our_support_includes', get_the_ID(), false))));
   $prev     = proofix_adjacent_service(get_the_ID(), 'prev');
   $next     = proofix_adjacent_service(get_the_ID(), 'next');
   $services = proofix_services();
@@ -17,7 +17,7 @@ while (have_posts()) : the_post();
 
   get_template_part('include/page-banner', null, array(
     'title'   => get_the_title(),
-    'text'    => get_the_excerpt(),
+    'text'    => (string) get_field('description', get_the_ID(), false),
     'crumbs'  => array(array('Services', proofix_url('services'))),
     'current' => get_the_title(),
   ));
@@ -27,7 +27,7 @@ while (have_posts()) : the_post();
   <section class="section">
     <div class="container detail-layout">
       <div class="detail-main">
-        <div class="icon-box"><?php echo proofix_icon(proofix_service_icon(get_the_ID())); ?></div>
+        <div class="icon-box"><?php echo proofix_service_icon(get_the_ID()); ?></div>
 
         <?php the_content(); ?>
 

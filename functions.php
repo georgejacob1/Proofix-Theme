@@ -37,7 +37,7 @@ function proofix_url($key)
 {
   $slugs = array(
     'about'    => 'about-us',
-    'process'  => 'our-process',
+    'process'  => 'process',
     'domains'  => 'research-domains',
     'faq'      => 'faq',
     'services' => 'services',
@@ -77,6 +77,18 @@ function proofix_services()
   ));
 }
 
+// Published items of any listed post type (faq, research_domain, process):
+// by Order field first, then newest first (same as the wp-admin list).
+function proofix_items($post_type)
+{
+  return get_posts(array(
+    'post_type'      => $post_type,
+    'post_status'    => 'publish',
+    'orderby'        => array('menu_order' => 'ASC', 'date' => 'DESC'),
+    'posts_per_page' => -1,
+  ));
+}
+
 // Previous / next service in menu order, wrapping around at the ends.
 function proofix_adjacent_service($post_id, $direction)
 {
@@ -101,11 +113,23 @@ function proofix_read_time($post_id)
   return $minutes > 0 ? $minutes . ' min read' : '';
 }
 
+// Service icon <img>: the ACF "Service Icon" image, or the default theme icon.
 function proofix_service_icon($post_id)
 {
-  $icon = get_post_meta($post_id, 'service_icon', true);
+  return proofix_field_icon($post_id, 'service_icon');
+}
 
-  return $icon ? $icon : 'file-signature.svg';
+// <img> for an ACF Image field holding an icon (service_icon, domain_icon),
+// or the default theme icon when nothing is uploaded.
+function proofix_field_icon($post_id, $field)
+{
+  $url = wp_get_attachment_url((int) get_post_meta($post_id, $field, true));
+
+  if (!$url) {
+    return proofix_icon('file-signature.svg');
+  }
+
+  return '<img class="icon" src="' . esc_url($url) . '" alt="">';
 }
 
 
@@ -209,8 +233,76 @@ function proofix_register_post_types()
     'show_in_rest'  => true,
   ));
 
+  // FAQ, Research Domain and Process items are only listed on their pages
+  // (faq, research-domains, process), so they get no single URLs of their own.
+  // That also keeps them from clashing with those page slugs.
+  $listed_only = array(
+    'public'             => false,
+    'show_ui'            => true,
+    'show_in_menu'       => true,
+    'show_in_nav_menus'  => false,
+    'publicly_queryable' => false,
+    'exclude_from_search' => true,
+    'has_archive'        => false,
+    'rewrite'            => false,
+    'query_var'          => false,
+    'show_in_rest'       => true,
+  );
+
+  register_post_type('faq', array_merge($listed_only, array(
+    'labels' => array(
+      'name'               => __('FAQs', 'proofix'),
+      'singular_name'      => __('FAQ', 'proofix'),
+      'add_new_item'       => __('Add New FAQ', 'proofix'),
+      'edit_item'          => __('Edit FAQ', 'proofix'),
+      'all_items'          => __('All FAQs', 'proofix'),
+      'search_items'       => __('Search FAQs', 'proofix'),
+      'not_found'          => __('No FAQs found.', 'proofix'),
+    ),
+    'menu_icon'     => 'dashicons-editor-help',
+    'menu_position' => 22,
+    // Question / answer come from ACF; Order = display order.
+    'supports'      => array('title', 'page-attributes'),
+  )));
+
+  register_post_type('research_domain', array_merge($listed_only, array(
+    'labels' => array(
+      'name'               => __('Research Domains', 'proofix'),
+      'singular_name'      => __('Research Domain', 'proofix'),
+      'add_new_item'       => __('Add New Research Domain', 'proofix'),
+      'edit_item'          => __('Edit Research Domain', 'proofix'),
+      'all_items'          => __('All Research Domains', 'proofix'),
+      'search_items'       => __('Search Research Domains', 'proofix'),
+      'not_found'          => __('No research domains found.', 'proofix'),
+    ),
+    'menu_icon'     => 'dashicons-portfolio',
+    'menu_position' => 23,
+    'supports'      => array('title', 'page-attributes'), // Everything else comes from ACF.
+  )));
+
+  register_post_type('process', array_merge($listed_only, array(
+    'labels' => array(
+      'name'               => __('Process Steps', 'proofix'),
+      'singular_name'      => __('Process Step', 'proofix'),
+      'add_new_item'       => __('Add New Process Step', 'proofix'),
+      'edit_item'          => __('Edit Process Step', 'proofix'),
+      'all_items'          => __('All Process Steps', 'proofix'),
+      'search_items'       => __('Search Process Steps', 'proofix'),
+      'not_found'          => __('No process steps found.', 'proofix'),
+    ),
+    'menu_icon'     => 'dashicons-list-view',
+    'menu_position' => 24,
+    'supports'      => array('title', 'page-attributes'), // Everything else comes from ACF.
+  )));
 }
 add_action('init', 'proofix_register_post_types');
+
+// Title placeholder on the FAQ edit screen.
+function proofix_title_placeholder($title, $post)
+{
+  return $post->post_type === 'faq' ? __('Add question', 'proofix') : $title;
+}
+add_filter('enter_title_here', 'proofix_title_placeholder', 10, 2);
 
 function proofix_rewrite_flush()
 {
@@ -305,12 +397,9 @@ function proofix_menu_fallback()
   <div class="has-menu"><button class="nav-link<?php echo is_page_template('template-research-domains.php') ? ' active' : ''; ?>" aria-haspopup="true">Research Domains <?php echo proofix_icon('chevron-down.svg'); ?></button>
     <div class="menu">
       <a href="<?php echo esc_url(proofix_url('domains')); ?>">All Domains</a>
-      <a href="<?php echo esc_url(proofix_url('domains') . '#domain-engineering'); ?>">Engineering &amp; Technology</a>
-      <a href="<?php echo esc_url(proofix_url('domains') . '#domain-cs-it'); ?>">Computer Science &amp; Information Technology</a>
-      <a href="<?php echo esc_url(proofix_url('domains') . '#domain-ai-ml'); ?>">Artificial Intelligence &amp; Machine Learning</a>
-      <a href="<?php echo esc_url(proofix_url('domains') . '#domain-datascience'); ?>">Data Science &amp; Analytics</a>
-      <a href="<?php echo esc_url(proofix_url('domains') . '#domain-management'); ?>">Management &amp; Business Research</a>
-      <a href="<?php echo esc_url(proofix_url('domains') . '#domain-healthcare'); ?>">Healthcare &amp; Medical Research</a>
+      <?php foreach (proofix_items('research_domain') as $domain) { ?>
+        <a href="<?php echo esc_url(proofix_url('domains') . '#domain-' . $domain->post_name); ?>"><?php echo esc_html($domain->post_title); ?></a>
+      <?php } ?>
     </div>
   </div>
   <a class="nav-link<?php echo is_page_template('template-process.php') ? ' active' : ''; ?>" href="<?php echo esc_url(proofix_url('process')); ?>">Our Process</a>

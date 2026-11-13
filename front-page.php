@@ -60,9 +60,9 @@ $contact  = proofix_contact();
       <div class="grid grid-4">
         <?php foreach ($services as $service) { ?>
           <a class="card service-card" href="<?php echo esc_url(get_permalink($service->ID)); ?>">
-            <div class="icon-box"><?php echo proofix_icon(proofix_service_icon($service->ID)); ?></div>
+            <div class="icon-box"><?php echo proofix_service_icon($service->ID); ?></div>
             <h3><?php echo esc_html($service->post_title); ?></h3>
-            <p><?php echo esc_html($service->post_excerpt); ?></p>
+            <p><?php echo esc_html(get_field('description', $service->ID, false)); ?></p>
             <span class="link-arrow">View details <?php echo proofix_icon('arrow-right.svg'); ?></span>
           </a>
         <?php } ?>
@@ -104,48 +104,16 @@ $contact  = proofix_contact();
       <p>From technology-driven research and data analysis to management, healthcare, education, and social sciences.</p>
     </div>
     <div class="grid grid-3">
-      <a class="card domain-tile" href="<?php echo esc_url(proofix_url('domains') . '#domain-engineering'); ?>">
-        <div class="icon-box"><?php echo proofix_icon('gears.svg'); ?></div>
-        <div>
-          <h3>Engineering &amp; Technology</h3>
-          <p>11 focus areas</p>
-        </div>
-      </a>
-      <a class="card domain-tile" href="<?php echo esc_url(proofix_url('domains') . '#domain-cs-it'); ?>">
-        <div class="icon-box"><?php echo proofix_icon('laptop-code.svg'); ?></div>
-        <div>
-          <h3>Computer Science &amp; Information Technology</h3>
-          <p>13 focus areas</p>
-        </div>
-      </a>
-      <a class="card domain-tile" href="<?php echo esc_url(proofix_url('domains') . '#domain-ai-ml'); ?>">
-        <div class="icon-box"><?php echo proofix_icon('brain.svg'); ?></div>
-        <div>
-          <h3>Artificial Intelligence &amp; Machine Learning</h3>
-          <p>12 focus areas</p>
-        </div>
-      </a>
-      <a class="card domain-tile" href="<?php echo esc_url(proofix_url('domains') . '#domain-datascience'); ?>">
-        <div class="icon-box"><?php echo proofix_icon('chart-line.svg'); ?></div>
-        <div>
-          <h3>Data Science &amp; Analytics</h3>
-          <p>10 focus areas</p>
-        </div>
-      </a>
-      <a class="card domain-tile" href="<?php echo esc_url(proofix_url('domains') . '#domain-management'); ?>">
-        <div class="icon-box"><?php echo proofix_icon('briefcase.svg'); ?></div>
-        <div>
-          <h3>Management &amp; Business Research</h3>
-          <p>12 focus areas</p>
-        </div>
-      </a>
-      <a class="card domain-tile" href="<?php echo esc_url(proofix_url('domains') . '#domain-healthcare'); ?>">
-        <div class="icon-box"><?php echo proofix_icon('heart-pulse.svg'); ?></div>
-        <div>
-          <h3>Healthcare &amp; Medical Research</h3>
-          <p>10 focus areas</p>
-        </div>
-      </a>
+      <?php foreach (proofix_items('research_domain') as $domain) {
+        $count = count(array_filter(array_map('trim', preg_split('/\R/', (string) get_field('focus_areas', $domain->ID, false))))); ?>
+        <a class="card domain-tile" href="<?php echo esc_url(proofix_url('domains') . '#domain-' . $domain->post_name); ?>">
+          <div class="icon-box"><?php echo proofix_field_icon($domain->ID, 'domain_icon'); ?></div>
+          <div>
+            <h3><?php echo esc_html($domain->post_title); ?></h3>
+            <?php if ($count) { ?><p><?php echo esc_html($count . ' focus areas'); ?></p><?php } ?>
+          </div>
+        </a>
+      <?php } ?>
     </div>
   </div>
 </section>
@@ -157,36 +125,17 @@ $contact  = proofix_contact();
       <p>A transparent journey from understanding your requirement to reviewing the work and incorporating feedback.</p>
     </div>
     <div class="grid grid-3">
-      <div class="card step-mini">
-        <div class="num">01</div>
-        <h3>Share Your Research Requirement</h3>
-        <p style="font-size:.92rem;margin:0">The process begins when you share your research requirement with us.</p>
-      </div>
-      <div class="card step-mini">
-        <div class="num">02</div>
-        <h3>Requirement Assessment</h3>
-        <p style="font-size:.92rem;margin:0">Once we receive your requirement, our team reviews the scope of the research and identifies the type of academic, technical, analytical, or editorial support that may be required.</p>
-      </div>
-      <div class="card step-mini">
-        <div class="num">03</div>
-        <h3>Research Planning</h3>
-        <p style="font-size:.92rem;margin:0">After understanding the requirements, a structured plan is developed based on the agreed scope of support.</p>
-      </div>
-      <div class="card step-mini">
-        <div class="num">04</div>
-        <h3>Expert Support &amp; Development</h3>
-        <p style="font-size:.92rem;margin:0">Based on the nature of the project, relevant academic, technical, analytical, or editorial support is provided.</p>
-      </div>
-      <div class="card step-mini">
-        <div class="num">05</div>
-        <h3>Review &amp; Quality Check</h3>
-        <p style="font-size:.92rem;margin:0">Before completing each stage, the work is reviewed based on the applicable project requirements.</p>
-      </div>
-      <div class="card step-mini">
-        <div class="num">06</div>
-        <h3>Feedback &amp; Refinement</h3>
-        <p style="font-size:.92rem;margin:0">Research often evolves through discussion, feedback, and refinement.</p>
-      </div>
+      <?php foreach (proofix_items('process') as $i => $step) {
+        $short = trim((string) get_field('short_description', $step->ID, false));
+        if ($short === '') {
+          $short = get_field('description', $step->ID, false);
+        } ?>
+        <div class="card step-mini">
+          <div class="num"><?php echo sprintf('%02d', $i + 1); ?></div>
+          <h3><?php echo esc_html($step->post_title); ?></h3>
+          <p style="font-size:.92rem;margin:0"><?php echo esc_html($short); ?></p>
+        </div>
+      <?php } ?>
     </div>
     <p style="text-align:center;margin-top:32px"><a class="btn btn-outline" href="<?php echo esc_url(proofix_url('process')); ?>">See the full process</a></p>
   </div>
@@ -198,24 +147,26 @@ $contact  = proofix_contact();
         <h2>Insights for Researchers</h2>
       </div>
       <div class="grid grid-2" style="max-width:900px;margin:0 auto">
-        <a class="card blog-card" href="<?php echo esc_url(home_url('/blog/quality-research-proposal/')); ?>">
-          <div class="thumb"><img src="https://picsum.photos/id/20/800/450" alt="" loading="lazy"></div>
-          <div class="body">
-            <div class="meta"><span class="tag">Research Proposal</span><span>3 min read</span></div>
-            <h3>How to Write a Quality Research Proposal?</h3>
-            <p>Writing a quality research proposal is of utmost importance to start your PhD journey. The emphasis should be on the uniqueness of the research being presented.</p>
-            <span class="link-arrow">Read article <?php echo proofix_icon('arrow-right.svg'); ?></span>
-          </div>
-        </a>
-        <a class="card blog-card" href="<?php echo esc_url(home_url('/blog/impactful-journal-paper/')); ?>">
-          <div class="thumb"><img src="https://picsum.photos/id/24/800/450" alt="" loading="lazy"></div>
-          <div class="body">
-            <div class="meta"><span class="tag">Publication</span><span>2 min read</span></div>
-            <h3>How to Make a Journal Paper Impactful?</h3>
-            <p>Any research focuses on the novelty in the topic selected and how original your ideas are to the particular research area.</p>
-            <span class="link-arrow">Read article <?php echo proofix_icon('arrow-right.svg'); ?></span>
-          </div>
-        </a>
+        <?php foreach (array_slice(proofix_items('blog'), 0, 2) as $blog) {
+          $tag  = get_field('blog_tag', $blog->ID, false);
+          $time = proofix_read_time($blog->ID); ?>
+          <a class="card blog-card" href="<?php echo esc_url(get_permalink($blog->ID)); ?>">
+            <div class="thumb">
+              <?php if (has_post_thumbnail($blog->ID)) {
+                echo get_the_post_thumbnail($blog->ID, 'proofix-blog-thumb', array('loading' => 'lazy', 'alt' => ''));
+              } ?>
+            </div>
+            <div class="body">
+              <div class="meta">
+                <?php if ($tag) { ?><span class="tag"><?php echo esc_html($tag); ?></span><?php } ?>
+                <?php if ($time) { ?><span><?php echo esc_html($time); ?></span><?php } ?>
+              </div>
+              <h3><?php echo esc_html($blog->post_title); ?></h3>
+              <p><?php echo esc_html(get_field('description', $blog->ID, false)); ?></p>
+              <span class="link-arrow">Read article <?php echo proofix_icon('arrow-right.svg'); ?></span>
+            </div>
+          </a>
+        <?php } ?>
       </div>
     </div>
   </section>
@@ -227,24 +178,14 @@ $contact  = proofix_contact();
       <h2>Frequently Asked Questions</h2>
     </div>
     <div class="faq-list">
-      <div class="faq-item">
-        <button class="faq-q" aria-expanded="false">What research support services do you provide?<?php echo proofix_icon('plus.svg'); ?></button>
-        <div class="faq-a">
-          <p>We provide comprehensive research support for PhD scholars, postgraduate students, and researchers, including research proposal and synopsis preparation, literature review, research methodology, data analysis, thesis and dissertation support, research paper writing, manuscript preparation, and publication guidance.</p>
+      <?php foreach (array_slice(proofix_items('faq'), 0, 3) as $faq) { ?>
+        <div class="faq-item">
+          <button class="faq-q" aria-expanded="false"><?php echo esc_html($faq->post_title); ?><?php echo proofix_icon('plus.svg'); ?></button>
+          <div class="faq-a">
+            <?php echo wpautop(esc_html(get_field('answer', $faq->ID, false))); ?>
+          </div>
         </div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-q" aria-expanded="false">Can you help me choose or refine my research topic?<?php echo proofix_icon('plus.svg'); ?></button>
-        <div class="faq-a">
-          <p>Yes. We can help you evaluate your research idea, identify research gaps, refine the research problem, formulate objectives and research questions, and develop a clear and researchable topic aligned with your academic domain.</p>
-        </div>
-      </div>
-      <div class="faq-item">
-        <button class="faq-q" aria-expanded="false">Do you provide support with statistical analysis and interpretation?<?php echo proofix_icon('plus.svg'); ?></button>
-        <div class="faq-a">
-          <p>Yes. We provide support for data preparation, statistical analysis, selection of appropriate tests, result interpretation, tables and graphical presentation, and discussion of findings using suitable statistical methodologies and software.</p>
-        </div>
-      </div>
+      <?php } ?>
     </div>
     <p style="text-align:center;margin-top:28px"><a class="link-arrow" href="<?php echo esc_url(proofix_url('faq')); ?>">More questions <?php echo proofix_icon('arrow-right.svg'); ?></a></p>
   </div>

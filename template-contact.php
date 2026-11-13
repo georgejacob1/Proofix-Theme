@@ -33,13 +33,11 @@ get_template_part('include/page-banner', null, array(
           <div class="form-group"><label for="inquiryDomain">Research Domain *</label>
             <select class="form-select" id="inquiryDomain">
               <option value="">Select domain</option>
-              <option value="Engineering &amp; Technology">Engineering &amp; Technology</option>
-              <option value="Computer Science &amp; Information Technology">Computer Science &amp; Information Technology</option>
-              <option value="Artificial Intelligence &amp; Machine Learning">Artificial Intelligence &amp; Machine Learning</option>
-              <option value="Data Science &amp; Analytics">Data Science &amp; Analytics</option>
-              <option value="Management &amp; Business Research">Management &amp; Business Research</option>
-              <option value="Healthcare &amp; Medical Research">Healthcare &amp; Medical Research</option>
-              <option value="Interdisciplinary / Other">Interdisciplinary / Other</option>
+              <?php foreach (proofix_items('research_domain') as $domain) {
+                $domain_title = get_the_title($domain); ?>
+                <option value="<?php echo esc_attr(wp_strip_all_tags($domain_title)); ?>"><?php echo esc_html(wp_strip_all_tags($domain_title)); ?></option>
+              <?php } ?>
+              <option value="Other">Other</option>
             </select>
           </div>
         </div>

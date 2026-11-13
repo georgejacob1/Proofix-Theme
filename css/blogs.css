@@ -11,7 +11,7 @@
 .blog-card h3 { font-size: 1.2rem; }
 .blog-card p { flex: 1; font-size: .94rem; }
 .article { max-width: 780px; margin: 0 auto; }
-.article-cover { border-radius: var(--r-lg); box-shadow: var(--shadow-lg); aspect-ratio: 16/8; object-fit: cover; width: 100%; margin: -56px 0 40px; position: relative; z-index: 2; }
+.article-cover { display: block; border-radius: var(--r-lg); box-shadow: var(--shadow-lg); aspect-ratio: 16/8; object-fit: cover; width: 100%; height: auto; margin: -56px 0 40px; position: relative; z-index: 2; }
 .article p, .article li { font-size: 1.08rem; color: var(--ink-soft); }
 .article ol { padding-left: 1.3em; margin: 0 0 1.4em; }
 .article ol li { margin-bottom: 12px; padding-left: 6px; }
