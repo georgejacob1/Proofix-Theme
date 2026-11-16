@@ -26,14 +26,30 @@ $contact  = proofix_contact();
       <div>
         <h4>Get in Touch</h4>
         <ul class="footer-contact">
-          <li><?php echo proofix_icon('envelope.svg'); ?><a href="mailto:<?php echo esc_attr($contact['email']); ?>"><?php echo esc_html($contact['email']); ?></a></li>
-          <li><?php echo proofix_icon('phone.svg'); ?><a href="tel:<?php echo esc_attr($contact['tel']); ?>"><?php echo esc_html($contact['phone']); ?></a></li>
-          <li><?php echo proofix_icon('whatsapp.svg'); ?><a href="<?php echo esc_url($contact['whatsapp']); ?>" target="_blank" rel="noopener">Chat on WhatsApp</a></li>
+			<?php
+$phone = get_field('phone', 8);
+$whatsapp   = get_field('whatsapp', 8);
+$mail = get_field('mail_id', 8);
+	?>		
+		  <?php if (!empty($mail)) { ?> 
+          <li><?php echo proofix_icon('envelope.svg'); ?><a href="mailto:<?php echo esc_attr($mail); ?>"><?php echo esc_html($mail); ?></a></li>
+		  <?php } ?>
+		  <?php if (!empty($phone)) {  
+		  $tel = preg_replace('/[^0-9+]/', '', $phone); ?>
+          <li><?php echo proofix_icon('phone.svg'); ?><a href="tel:<?php echo esc_attr($tel); ?>"><?php echo esc_html($phone); ?></a></li>
+		  <?php } ?>
+		  <?php if (!empty($whatsapp)) {
+	      $whatsapp_link = preg_replace('/[^0-9]/', '', $whatsapp); ?>
+          <li><?php echo proofix_icon('whatsapp.svg'); ?><a href="https://wa.me/<?php echo esc_attr($whatsapp_link); ?>" target="_blank" rel="noopener">Chat on WhatsApp</a></li>
+			<?php } ?>
         </ul>
       </div>
     </div>
     <div class="footer-bottom"><span>&copy; <?php echo date('Y'); ?> Proofix Technologies Pvt Ltd. All rights reserved.</span><span>Empowering Research. Enabling Excellence.</span></div>
   </div>
 </footer>
-<a class="whatsapp-float" href="<?php echo esc_url($contact['whatsapp'] . '?text=' . rawurlencode('Hi Proofix')); ?>" target="_blank" rel="noopener" aria-label="Chat on WhatsApp"><?php echo proofix_icon('whatsapp.svg'); ?></a>
+<?php if (!empty($whatsapp)) { 
+$whatsapp_link = preg_replace('/[^0-9]/', '', $whatsapp); ?>
+<a class="whatsapp-float" href="<?php echo esc_url('https://wa.me/' . $whatsapp_link . '?text=' . rawurlencode('Hi Proofix')); ?>" target="_blank" rel="noopener" aria-label="Chat on WhatsApp"><?php echo proofix_icon('whatsapp.svg'); ?></a> 
+<?php } ?>
 <button class="back-to-top" id="backToTop" aria-label="Back to top"><?php echo proofix_icon('arrow-up.svg'); ?></button>

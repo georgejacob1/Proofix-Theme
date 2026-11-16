@@ -144,9 +144,9 @@ function proofix_hero_title()
   }
 
   $avatars = '<span class="avatars">'
-    . '<img src="https://picsum.photos/id/1005/96/96" alt="">'
-    . '<img src="https://picsum.photos/id/1011/96/96" alt="">'
-    . '<img src="https://picsum.photos/id/1027/96/96" alt="">'
+    . '<img src="https://proofix.in/wp-content/uploads/2026/11/aiony-haust-3TLl_97HNJo-unsplash-1-scaled.jpg" alt="avatar">'
+    . '<img src="https://proofix.in/wp-content/uploads/2026/11/alex-suprun-ZHvM3XIOHoE-unsplash-1-2-scaled.jpg" alt="avatar">'
+    . '<img src="https://proofix.in/wp-content/uploads/2026/11/md-mahdi-YyxoZEP6gCw-unsplash-1-scaled.jpg" alt="avatar">'
     . '</span>';
 
   $html = esc_html($title);

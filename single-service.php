@@ -13,7 +13,9 @@ while (have_posts()) : the_post();
   $prev     = proofix_adjacent_service(get_the_ID(), 'prev');
   $next     = proofix_adjacent_service(get_the_ID(), 'next');
   $services = proofix_services();
-  $wa_text  = rawurlencode('Hi Proofix, I need help with: ' . get_the_title());
+  $title = html_entity_decode(get_the_title(), ENT_QUOTES, 'UTF-8');
+  $wa_text  = rawurlencode('Hi Proofix, I need help with: ' . $title);
+  $whatsapp   = get_field('whatsapp', 8);
 
   get_template_part('include/page-banner', null, array(
     'title'   => get_the_title(),
@@ -53,7 +55,10 @@ while (have_posts()) : the_post();
           <h4>Need help with this?</h4>
           <p style="font-size:.94rem">Tell us your research stage and we'll connect you with a subject matter expert.</p>
           <a class="btn btn-accent btn-block" href="<?php echo esc_url(add_query_arg('service', get_post_field('post_name'), proofix_url('contact'))); ?>">Book Consultation</a>
-          <a class="btn btn-whatsapp btn-block" target="_blank" rel="noopener" href="<?php echo esc_url($contact['whatsapp'] . '?text=' . $wa_text); ?>"><?php echo proofix_icon('whatsapp.svg'); ?> Chat on WhatsApp</a>
+		 <?php if (!empty($whatsapp)) {
+	      $whatsapp_link = preg_replace('/[^0-9]/', '', $whatsapp); ?>
+          <a class="btn btn-whatsapp btn-block" target="_blank" rel="noopener" href="<?php echo esc_url('https://wa.me/' . $whatsapp_link . '?text=' . $wa_text); ?>"><?php echo proofix_icon('whatsapp.svg'); ?> Chat on WhatsApp</a>
+			<?php } ?>
         </div>
         <div class="side-box side-list">
           <h4>All services</h4>

@@ -66,19 +66,32 @@ get_template_part('include/page-banner', null, array(
       </form>
       <div class="form-success" id="formSuccessBox" aria-live="polite"></div>
     </div>
+	  <?php
+      $phone = get_field('phone', 8);
+      $whatsapp   = get_field('whatsapp', 8);
+      $mail = get_field('mail_id', 8);
+	  ?>		
     <aside class="side-box">
       <h3>Prefer a quicker way?</h3>
       <p>If you are busy and out of time, just drop a "Hi" on WhatsApp. Our consultant shall connect back at the earliest and schedule a consultation with a Subject Matter Expert from your domain.</p>
-      <a class="btn btn-whatsapp btn-block" href="<?php echo esc_url($contact['whatsapp'] . '?text=Hi'); ?>" target="_blank" rel="noopener"><?php echo proofix_icon('whatsapp.svg'); ?> Say "Hi" on WhatsApp</a>
+		<?php if (!empty($whatsapp)) { 
+		$whatsapp_link = preg_replace('/[^0-9]/', '', $whatsapp);  ?>
+      <a class="btn btn-whatsapp btn-block" href="<?php echo esc_url('https://wa.me/' . $whatsapp_link . '?text=' . rawurlencode('Hi Proofix')); ?>" target="_blank" rel="noopener"><?php echo proofix_icon('whatsapp.svg'); ?> Say "Hi" on WhatsApp</a>
+		<?php } ?>
       <div style="margin-top:20px">
+		 <?php if (!empty($mail)) { ?>
         <div class="contact-item">
           <div class="icon-box"><?php echo proofix_icon('envelope.svg'); ?></div>
-          <div><small>Email</small><a href="mailto:<?php echo esc_attr($contact['email']); ?>"><?php echo esc_html($contact['email']); ?></a></div>
+          <div><small>Email</small><a href="mailto:<?php echo esc_attr($mail); ?>"><?php echo esc_html($mail); ?></a></div>
         </div>
+		  <?php } ?>
+		  <?php if (!empty($phone)) { 
+		   $tel = preg_replace('/[^0-9+]/', '', $phone); ?>
         <div class="contact-item">
           <div class="icon-box"><?php echo proofix_icon('phone.svg'); ?></div>
-          <div><small>Phone</small><a href="tel:<?php echo esc_attr($contact['tel']); ?>"><?php echo esc_html($contact['phone']); ?></a></div>
+          <div><small>Phone</small><a href="tel:<?php echo esc_attr($tel); ?>"><?php echo esc_html($phone); ?></a></div>
         </div>
+		  <?php } ?>
       </div>
     </aside>
   </div>
