@@ -42,6 +42,7 @@ function proofix_url($key)
     'faq'      => 'faq',
     'services' => 'services',
     'blogs'    => 'blogs',
+    'careers'  => 'careers',
     'contact'  => 'contact-us',
   );
 
@@ -92,18 +93,43 @@ function proofix_items($post_type)
 // Previous / next service in menu order, wrapping around at the ends.
 function proofix_adjacent_service($post_id, $direction)
 {
-  $services = proofix_services();
-  $ids = wp_list_pluck($services, 'ID');
+  return proofix_adjacent_in(proofix_services(), $post_id, $direction);
+}
+
+// Previous / next post within a list, wrapping around at the ends.
+function proofix_adjacent_in($posts, $post_id, $direction)
+{
+  $ids = wp_list_pluck($posts, 'ID');
   $index = array_search($post_id, $ids);
 
-  if ($index === false || count($services) < 2) {
+  if ($index === false || count($posts) < 2) {
     return null;
   }
 
-  $count = count($services);
+  $count = count($posts);
   $target = ($direction === 'prev') ? ($index - 1 + $count) % $count : ($index + 1) % $count;
 
-  return $services[$target];
+  return $posts[$target];
+}
+
+// Non-empty lines of an ACF Textarea field (one item per line).
+function proofix_lines($post_id, $field)
+{
+  return array_values(array_filter(array_map('trim', preg_split('/\R/', (string) get_post_meta($post_id, $field, true)))));
+}
+
+// Address applications go to: the contact page's "mail_id" field, or the default.
+function proofix_careers_email()
+{
+  $mail = function_exists('get_field') ? get_field('mail_id', 8) : '';
+
+  return is_email($mail) ? $mail : 'proofix.tech@gmail.com';
+}
+
+// mailto: link with the "Career Application – <position>" subject filled in.
+function proofix_career_mailto($position)
+{
+  return 'mailto:' . proofix_careers_email() . '?subject=' . rawurlencode('Career Application – ' . $position);
 }
 
 function proofix_read_time($post_id)
@@ -174,6 +200,11 @@ function proofix_assets_js_css()
     wp_enqueue_style('proofix-faq', get_template_directory_uri() . '/css/faq.css', array(), $version);
   } elseif (is_singular('service')) {
     wp_enqueue_style('proofix-service-detail', get_template_directory_uri() . '/css/service-detail.css', array(), $version);
+  } elseif (is_singular('career')) {
+    wp_enqueue_style('proofix-service-detail', get_template_directory_uri() . '/css/service-detail.css', array(), $version);
+    wp_enqueue_style('proofix-careers', get_template_directory_uri() . '/css/careers.css', array(), $version);
+  } elseif (is_page_template('template-careers.php')) {
+    wp_enqueue_style('proofix-careers', get_template_directory_uri() . '/css/careers.css', array(), $version);
   } elseif (is_page_template('template-services.php')) {
     wp_enqueue_style('proofix-services', get_template_directory_uri() . '/css/services.css', array(), $version);
   } elseif (is_singular('blog') || is_page_template('template-blogs.php')) {
@@ -253,6 +284,28 @@ function proofix_register_post_types()
     'menu_icon'     => 'dashicons-edit-page',
     'menu_position' => 21,
     'supports'      => array('title', 'editor', 'excerpt', 'thumbnail'),
+    'show_in_rest'  => true,
+  ));
+
+  // Career openings: listed on the Careers page (template-careers.php),
+  // each with its own detail page at /career/<slug>/.
+  register_post_type('career', array(
+    'labels' => array(
+      'name'               => __('Careers', 'proofix'),
+      'singular_name'      => __('Career', 'proofix'),
+      'add_new_item'       => __('Add New Opening', 'proofix'),
+      'edit_item'          => __('Edit Opening', 'proofix'),
+      'all_items'          => __('All Openings', 'proofix'),
+      'search_items'       => __('Search Openings', 'proofix'),
+      'not_found'          => __('No openings found.', 'proofix'),
+    ),
+    'public'        => true,
+    'has_archive'   => false,
+    'rewrite'       => array('slug' => 'career', 'with_front' => false),
+    'menu_icon'     => 'dashicons-businessperson',
+    'menu_position' => 25,
+    // Editor = intro paragraphs on the detail page; Order = listing order.
+    'supports'      => array('title', 'editor', 'page-attributes'),
     'show_in_rest'  => true,
   ));
 
@@ -469,6 +522,7 @@ function proofix_footer_menu_fallback()
   <li><a href="<?php echo esc_url(proofix_url('process')); ?>">Our Process</a></li>
   <li><a href="<?php echo esc_url(proofix_url('blogs')); ?>">Blogs</a></li>
   <li><a href="<?php echo esc_url(proofix_url('faq')); ?>">FAQ</a></li>
+  <li><a href="<?php echo esc_url(proofix_url('careers')); ?>">Careers</a></li>
   <li><a href="<?php echo esc_url(proofix_url('contact')); ?>">Contact Us</a></li>
 <?php
 }

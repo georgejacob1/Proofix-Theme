@@ -8,6 +8,20 @@ $contact  = proofix_contact();
       <div class="footer-brand">
         <img src="<?php echo TEMPLATE_URL; ?>assets/images/logo.png" alt="Proofix Technologies">
         <p>Proofix Technologies Pvt Ltd provides professional academic research assistance and technical research support for scholars, researchers, faculty members and academic professionals.</p>
+        <?php
+        $socials = array(
+          'instagram' => array('Instagram', 'instagram.svg'),
+          'linkedin'  => array('LinkedIn', 'linkedin-in.svg'),
+          'facebook'  => array('Facebook', 'facebook-f.svg'),
+        );
+        ?>
+        <ul class="footer-social">
+          <?php foreach ($socials as $field => $social) {
+            $url = get_field($field, 8);
+            if (empty($url)) { $url = '#'; } ?>
+            <li><a href="<?php echo esc_url($url); ?>" target="_blank" rel="noopener" aria-label="<?php echo esc_attr($social[0]); ?>"><?php echo proofix_icon($social[1]); ?></a></li>
+          <?php } ?>
+        </ul>
       </div>
       <div>
         <h4>Quick Links</h4>

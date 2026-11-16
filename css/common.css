@@ -996,15 +996,47 @@ ul {
 
 .footer-contact .icon { filter: var(--f-accent); }
 
+.footer-social {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.site-footer .footer-social li { margin: 0; }
+
+.footer-social a {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, .18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .2s, border-color .2s;
+}
+
+.footer-social .icon {
+  width: 16px;
+  height: 16px;
+  filter: var(--f-white);
+}
+
+.footer-social a:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
 /* Running banner (top of header) */
 .top-banner {
   background: var(--primary, #0b3d91);
   color: #fff;
   overflow: hidden;
-  font-size: 13px;
-  font-weight: 500;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-style: italic;
+  font-size: 15px;
+  font-weight: 400;
   text-transform: uppercase;
-  letter-spacing: .06em;
+  letter-spacing: .04em;
   line-height: 34px;
   height: 34px;
 }
